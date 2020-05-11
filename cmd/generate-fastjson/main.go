@@ -19,19 +19,17 @@ import (
 	"flag"
 	"fmt"
 	"go/ast"
-	"go/build"
 	"go/format"
-	"go/importer"
-	"go/parser"
 	"go/token"
 	"go/types"
 	"io"
 	"log"
 	"os"
-	"path/filepath"
 	"reflect"
 	"sort"
 	"strings"
+
+	"golang.org/x/tools/go/packages"
 )
 
 const (
@@ -73,37 +71,18 @@ func main() {
 		}
 	}
 
-	cwd, err := os.Getwd()
+	cfg := &packages.Config{
+		Mode: packages.NeedTypes | packages.NeedSyntax | packages.NeedTypesInfo,
+	}
+	pkgs, err := packages.Load(cfg, flag.Arg(0))
 	if err != nil {
-		log.Fatal(err)
+		fmt.Fprintf(os.Stderr, "load: %v\n", err)
+		os.Exit(1)
 	}
-	buildPkg, err := build.Default.Import(flag.Arg(0), cwd, build.ImportComment)
-	if err != nil {
-		log.Fatal(err)
+	if packages.PrintErrors(pkgs) > 0 {
+		os.Exit(1)
 	}
-
-	fset := token.NewFileSet()
-	files := make([]*ast.File, len(buildPkg.GoFiles))
-	for i, goFile := range buildPkg.GoFiles {
-		filename := filepath.Join(buildPkg.Dir, goFile)
-		f, err := parser.ParseFile(fset, filename, nil, parser.ParseComments|parser.DeclarationErrors)
-		if err != nil {
-			log.Fatal(err)
-		}
-		files[i] = f
-	}
-
-	cfg := types.Config{
-		IgnoreFuncBodies: true,
-		Importer:         importer.Default(),
-	}
-	info := types.Info{
-		Defs: make(map[*ast.Ident]types.Object),
-	}
-	pkg, err := cfg.Check(buildPkg.ImportPath, fset, files, &info)
-	if err != nil {
-		log.Fatal(err)
-	}
+	pkg := pkgs[0]
 
 	var buf bytes.Buffer
 	fmt.Fprintf(&buf, `
@@ -114,10 +93,10 @@ package %s
 import (
 	%q
 )
-`[1:], pkg.Name(), fastjsonPath)
+`[1:], pkg.Types.Name(), fastjsonPath)
 
 	var generated int
-	for _, f := range files {
+	for _, f := range pkg.Syntax {
 		for _, decl := range f.Decls {
 			genDecl, ok := decl.(*ast.GenDecl)
 			if !ok || genDecl.Tok != token.TYPE {
@@ -128,7 +107,7 @@ import (
 				if !ok {
 					continue
 				}
-				obj := info.Defs[typeSpec.Name]
+				obj := pkg.TypesInfo.Defs[typeSpec.Name]
 				if obj == nil || !obj.Exported() {
 					continue
 				}
