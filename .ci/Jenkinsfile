@@ -31,22 +31,30 @@ pipeline {
         stash allowEmpty: true, name: 'source', useDefaultExcludes: false
       }
     }
-    stage('Local') {
-      steps {
-        cleanup()
-        withGoEnv(){
-          dir("${BASE_DIR}"){
-            sh(label: 'local',script: 'make local')
+    stage('Test') {
+      failFast false
+      matrix {
+        agent { label 'ubuntu-18 && immutable' }
+        options { skipDefaultCheckout() }
+        axes {
+          axis {
+            name 'GO_VERSION'
+            values '1.8', '1.15.6'
           }
         }
-      }
-    }
-    stage('Test') {
-      steps {
-        cleanup()
-        withGoEnv(){
-          dir("${BASE_DIR}"){
-            sh(label: 'test', script: 'make test')
+        stages {
+          stage('Test') {
+            steps {
+              withGithubNotify(context: "Test-${GO_VERSION}-${OS_VERSION}") {
+                cleanup()
+                withGoEnv(version: "${GO_VERSION}"){
+                  dir("${BASE_DIR}"){
+                    sh(label: 'get', script: 'go get')
+                    sh(label: 'test', script: 'go test -v')
+                  }
+                }
+              }
+            }
           }
         }
       }
