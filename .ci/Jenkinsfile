@@ -45,7 +45,7 @@ pipeline {
         stages {
           stage('Test') {
             steps {
-              withGithubNotify(context: "Test-${GO_VERSION}-${OS_VERSION}") {
+              withGithubNotify(context: "Test-${GO_VERSION}") {
                 cleanup()
                 withGoEnv(version: "${GO_VERSION}"){
                   dir("${BASE_DIR}"){
