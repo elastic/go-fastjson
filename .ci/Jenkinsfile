@@ -45,13 +45,13 @@ pipeline {
         stages {
           stage('Test') {
             steps {
-              withGithubNotify(context: "Test-${GO_VERSION}-${OS_VERSION}") {
+              withGithubNotify(context: "Test-${GO_VERSION}") {
                 deleteDir()
                 unstash 'source'
                 withGoEnv(version: "${GO_VERSION}"){
                   dir("${BASE_DIR}"){
-                    sh(label: "go get for ${GO_VERSION} in ${PLATFORM}", script: 'go get')
-                    sh(label: "go test for ${GO_VERSION} in ${PLATFORM}", script: '.ci/test.sh')
+                    sh(label: "go get for ${GO_VERSION}", script: 'go get')
+                    sh(label: "go test for ${GO_VERSION}", script: '.ci/test.sh')
                   }
                 }
               }
