@@ -50,7 +50,6 @@ pipeline {
                 unstash 'source'
                 withGoEnv(version: "${GO_VERSION}"){
                   dir("${BASE_DIR}"){
-                    sh(label: "go get for ${GO_VERSION}", script: 'go get')
                     sh(label: "go test for ${GO_VERSION}", script: '.ci/test.sh')
                   }
                 }
