@@ -1,4 +1,4 @@
-[![Travis-CI](https://travis-ci.org/elastic/go-fastjson.svg)](https://travis-ci.org/elastic/go-fastjson)
+[![Build Status](https://beats-ci.elastic.co/job/Library/job/go-fastjson-mbp/job/master/badge/icon)](https://beats-ci.elastic.co/job/Library/job/go-fastjson-mbp/job/master/)
 
 # fastjson: fast JSON encoder for Go
 
