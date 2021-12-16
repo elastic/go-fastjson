@@ -1,4 +1,4 @@
-[![Build Status](https://beats-ci.elastic.co/job/Library/job/go-fastjson-mbp/job/master/badge/icon)](https://beats-ci.elastic.co/job/Library/job/go-fastjson-mbp/job/master/)
+[![Build Status](https://beats-ci.elastic.co/job/Library/job/go-fastjson-mbp/job/main/badge/icon)](https://beats-ci.elastic.co/job/Library/job/go-fastjson-mbp/job/main/)
 
 # fastjson: fast JSON encoder for Go
 
