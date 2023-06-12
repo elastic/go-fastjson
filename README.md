@@ -9,7 +9,7 @@ methods for all exported types within a specified package.
 
 ## Requirements
 
-Go 1.8+
+Go 1.19+
 
 ## License
 
