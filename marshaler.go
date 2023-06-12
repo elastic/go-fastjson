@@ -17,8 +17,6 @@ package fastjson
 import (
 	"encoding/json"
 	"fmt"
-
-	"github.com/pkg/errors"
 )
 
 // Marshaler defines an interface that types can implement to provide
@@ -59,7 +57,7 @@ type Appender interface {
 // panics due to a broken json.Marshaler implementation or assumption, then
 // Marshal will encode the panic as
 //
-//     {"__PANIC__": "panic calling MarshalJSON for type Foo: reason"}
+//	{"__PANIC__": "panic calling MarshalJSON for type Foo: reason"}
 //
 // Marshal returns the first error encountered.
 func Marshal(w *Writer, v interface{}) error {
@@ -133,7 +131,7 @@ func marshalReflect(w *Writer, v interface{}) (result error) {
 			if !ok {
 				err = fmt.Errorf("%s", r)
 			}
-			result = errors.Wrapf(err, "panic calling MarshalJSON for type %T", v)
+			result = fmt.Errorf("panic calling MarshalJSON for type %T: %w", v, err)
 			w.RawString(`{"__PANIC__":`)
 			w.String(fmt.Sprint(result))
 			w.RawByte('}')
