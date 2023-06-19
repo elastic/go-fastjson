@@ -53,3 +53,15 @@ func TestWriterStringEscapes(t *testing.T) {
 	w.StringContents(string([]byte{255}))
 	assertEncoded(t, &w, `\ufffd`)
 }
+
+func BenchmarkString(b *testing.B) {
+	w := Writer{
+		buf: make([]byte, 0, 1024),
+	}
+	b.Run("string", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			w.Reset()
+			w.String("foobarstring-go-fastjson")
+		}
+	})
+}
