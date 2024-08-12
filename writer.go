@@ -126,16 +126,20 @@ func (w *Writer) StringContents(s string) {
 			// single-with character, need to escape
 			w.RawString(s[p:i])
 			switch c {
-			case '\t':
-				w.RawString(`\t`)
-			case '\r':
-				w.RawString(`\r`)
-			case '\n':
-				w.RawString(`\n`)
 			case '\\':
 				w.RawString(`\\`)
 			case '"':
 				w.RawString(`\"`)
+			case '\b':
+				w.RawString(`\b`)
+			case '\f':
+				w.RawString(`\f`)
+			case '\n':
+				w.RawString(`\n`)
+			case '\r':
+				w.RawString(`\r`)
+			case '\t':
+				w.RawString(`\t`)
 			default:
 				w.RawString(`\u00`)
 				w.RawByte(chars[c>>4])
