@@ -1,8 +1,11 @@
 package fastjson
 
 import (
+	"bytes"
+	"encoding/json"
 	"testing"
 	"time"
+	"unicode/utf8"
 )
 
 func TestWriterReset(t *testing.T) {
@@ -34,6 +37,25 @@ func TestWriterTime(t *testing.T) {
 	var w Writer
 	w.Time(time.Unix(0, 0).UTC(), time.RFC1123Z)
 	assertEncoded(t, &w, `Thu, 01 Jan 1970 00:00:00 +0000`)
+}
+
+func TestWriterString(t *testing.T) {
+	var i rune
+	for i = 0; i < utf8.MaxRune; i++ {
+		s := string(i)
+		var w Writer
+		w.String(s)
+
+		expected, err := json.Marshal(s)
+		if err != nil {
+			t.Errorf("json.Marshal returned unexpected error: %v", err)
+		}
+
+		got := w.Bytes()
+		if !bytes.Equal(expected, got) {
+			t.Errorf("rune %d: expected '%s', got '%s'", i, expected, got)
+		}
+	}
 }
 
 func TestWriterStringEscapes(t *testing.T) {
