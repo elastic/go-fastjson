@@ -274,6 +274,9 @@ if err := %s.%s(w); err != nil && firstErr == nil {
 		generateInterfaceValue(w, expr, t)
 	case *types.Struct:
 		generateStructValue(w, expr, t)
+	case *types.Alias:
+		unaliasType := types.Unalias(t)
+		generateValue(w, expr, unaliasType)
 	default:
 		panic(fmt.Errorf("unhandled type %T", t))
 	}
@@ -394,6 +397,9 @@ func isNonZero(expr string, t types.Type) string {
 		default:
 			zero = "0"
 		}
+	case *types.Alias:
+		unaliasType := types.Unalias(t)
+		isNonZero(expr, unaliasType)
 	default:
 		panic(fmt.Errorf("unhandled type %T", t))
 	}
