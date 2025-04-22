@@ -15,7 +15,6 @@
 package fastjson
 
 import (
-	"math"
 	"strconv"
 	"time"
 	"unicode/utf8"
@@ -82,10 +81,6 @@ func (w *Writer) Float32(n float32) {
 
 // Float64 appends n to the buffer.
 func (w *Writer) Float64(n float64) {
-	if math.IsNaN(n) || math.IsInf(n, 0) {
-		w.buf = append(w.buf, '0')
-		return
-	}
 	w.buf = strconv.AppendFloat(w.buf, float64(n), 'g', -1, 64)
 }
 

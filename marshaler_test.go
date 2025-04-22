@@ -3,6 +3,7 @@ package fastjson
 import (
 	"encoding/json"
 	"errors"
+	"math"
 	"reflect"
 	"testing"
 )
@@ -40,6 +41,30 @@ func TestMarshal(t *testing.T) {
 	mustUnmarshal(w.Bytes(), &fastjsonDecoded)
 	if !reflect.DeepEqual(stdlibDecoded, fastjsonDecoded) {
 		t.Fatal("different encoding")
+	}
+}
+
+func TestMarshalError(t *testing.T) {
+	m := map[string]interface{}{
+		"nan-float32":  float32(math.NaN()),
+		"nan-float64":  float64(math.NaN()),
+		"-inf-float32": float32(math.Inf(-1)),
+		"-inf-float64": float32(math.Inf(-1)),
+		"+inf-float32": float32(math.Inf(+1)),
+		"+inf-float64": float32(math.Inf(+1)),
+	}
+
+	for k, v := range m {
+		_, stdlibErr := json.Marshal(v)
+		if stdlibErr == nil {
+			t.Errorf("%s: expected stdlib err: %v", k, stdlibErr)
+		}
+
+		var w Writer
+		err := Marshal(&w, v)
+		if err == nil {
+			t.Errorf("%s: expected fastjson err: %v", k, err)
+		}
 	}
 }
 

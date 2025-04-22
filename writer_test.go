@@ -95,7 +95,7 @@ func BenchmarkFloat(b *testing.B) {
 	b.Run("string", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			w.Reset()
-			w.Float64(3.14 + float64(i))
+			Marshal(&w, 3.14+float64(i))
 		}
 	})
 }

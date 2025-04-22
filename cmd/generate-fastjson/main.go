@@ -91,7 +91,15 @@ func main() {
 package %s
 
 import (
+	"errors"
+	"math"
+
 	%q
+)
+
+var (
+	_ = errors.New
+	_ = math.IsNaN
 )
 `[1:], pkg.Types.Name(), fastjsonPath)
 
@@ -314,8 +322,24 @@ func generateBasicValue(w *bytes.Buffer, expr string, exprType *types.Basic) {
 		method = "Uint64"
 	case types.Float32:
 		method = "Float32"
+		fmt.Fprintf(w, `
+if math.IsNaN(float64(%s)) {
+	return errors.New("json: '%s': unsupported value: NaN")
+}
+if math.IsInf(float64(%s), 0) {
+	return errors.New("json: '%s': unsupported value: Inf")
+}
+`[1:], expr, expr, expr, expr)
 	case types.Float64:
 		method = "Float64"
+		fmt.Fprintf(w, `
+if math.IsNaN(%s) {
+	return errors.New("json: '%s': unsupported value: NaN")
+}
+if math.IsInf(%s, 0) {
+	return errors.New("json: '%s': unsupported value: Inf")
+}
+`[1:], expr, expr, expr, expr)
 	case types.String:
 		method = "String"
 	default:
