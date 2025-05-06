@@ -16,7 +16,9 @@ package fastjson
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"math"
 )
 
 // Marshaler defines an interface that types can implement to provide
@@ -87,8 +89,20 @@ func Marshal(w *Writer, v interface{}) error {
 	case int64:
 		w.Int64(v)
 	case float32:
+		if math.IsNaN(float64(v)) {
+			return errors.New("json: unsupported value: NaN")
+		}
+		if math.IsInf(float64(v), 0) {
+			return errors.New("json: unsupported value: Inf")
+		}
 		w.Float32(v)
 	case float64:
+		if math.IsNaN(v) {
+			return errors.New("json: unsupported value: NaN")
+		}
+		if math.IsInf(v, 0) {
+			return errors.New("json: unsupported value: Inf")
+		}
 		w.Float64(v)
 	case bool:
 		w.Bool(v)

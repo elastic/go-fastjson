@@ -87,3 +87,15 @@ func BenchmarkString(b *testing.B) {
 		}
 	})
 }
+
+func BenchmarkFloat(b *testing.B) {
+	w := Writer{
+		buf: make([]byte, 0, 1024),
+	}
+	b.Run("string", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			w.Reset()
+			Marshal(&w, 3.14+float64(i))
+		}
+	})
+}
