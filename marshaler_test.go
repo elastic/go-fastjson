@@ -49,9 +49,9 @@ func TestMarshalError(t *testing.T) {
 		"nan-float32":  float32(math.NaN()),
 		"nan-float64":  float64(math.NaN()),
 		"-inf-float32": float32(math.Inf(-1)),
-		"-inf-float64": float32(math.Inf(-1)),
+		"-inf-float64": float64(math.Inf(-1)),
 		"+inf-float32": float32(math.Inf(+1)),
-		"+inf-float64": float32(math.Inf(+1)),
+		"+inf-float64": float64(math.Inf(+1)),
 	}
 
 	for k, v := range m {
