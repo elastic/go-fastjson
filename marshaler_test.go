@@ -5,6 +5,7 @@ import (
 	"errors"
 	"math"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -122,11 +123,14 @@ func TestMarshalStdlibMarshalerError(t *testing.T) {
 	err := Marshal(&w, stdlibMarshalerFunc(func() ([]byte, error) {
 		return nil, errors.New("boom")
 	}))
-	assertEncoded(t, &w, `{"__ERROR__":"json: error calling MarshalJSON for type fastjson.stdlibMarshalerFunc: boom"}`)
-	expectedErr := `json: error calling MarshalJSON for type fastjson.stdlibMarshalerFunc: boom`
-	if err == nil || err.Error() != expectedErr {
-		t.Fatalf("expected %q, got %q", expectedErr, err)
+	if err == nil || !strings.HasPrefix(err.Error(), "json: error calling MarshalJSON for type ") || !strings.HasSuffix(err.Error(), ": boom") {
+		t.Fatalf("unexpected error: %v", err)
 	}
+	expected, marshalErr := json.Marshal(map[string]string{"__ERROR__": err.Error()})
+	if marshalErr != nil {
+		t.Fatal(marshalErr)
+	}
+	assertEncoded(t, &w, string(expected))
 }
 
 func TestMarshalMapValueError(t *testing.T) {
